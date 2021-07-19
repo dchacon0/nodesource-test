@@ -1,4 +1,6 @@
 # Logs
+# Keys folder
+keys/
 logs
 *.log
 npm-debug.log*
