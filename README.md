@@ -1,12 +1,12 @@
 # About this repository
 This repo has all the scrips required to acomplish the following task:
 
-    1. Create a troposphere (https://github.com/cloudtools/troposphere) script to launch an
-    ECS cluster, Application Load Balancer and an Auto Scaling Group that serve two
-    random Node.js (You may use N|Solid images) microservices which images are pulled
-    from ECR. Listeners should route traffic from the /service1 and /service2 URLs to
-    the defined container ports. It is a plus if you add an Ansible playbook that is in charge of
-    controlling the version of the ECS agent installed on the server.
+Create a troposphere (https://github.com/cloudtoolstroposphere) script to launch an
+ECS cluster, Application Load Balancer and an Auto ScalingGroup that serve two
+random Node.js (You may use N|Solid images) microserviceswhich images are pulled
+from ECR. Listeners should route traffic from the /service1 and /service2 URLs to
+the defined container ports. It is a plus if you add anAnsible playbook that is in charge of
+controlling the version of the ECS agent installed on theserver.
 
 ## How to use this repo
 > Keep in mind that the ECR is created using troposphere, so once it gets created you can validate the output of the cloud formation stack.
@@ -19,7 +19,7 @@ This repo has all the scrips required to acomplish the following task:
 2. **Create the ECR Repository**
     ```sh
     python3 create-ecr.py # troposphere script that create cloudformation file with name "create-ecr.yaml"
-    aws --region us-east-1  cloudformation update-stack --stack-name create-ecr-nodesource --template-body file://create-ecr.yaml # Remember you should have configured the AWSCLI authentication
+    aws --region us-east-1  cloudformation create-stack --stack-name create-ecr-nodesource --template-body file://create-ecr.yaml # Remember you should have configured the AWSCLI authentication
     ```
 3. **Push the Docker Image to ECR**
 
@@ -36,7 +36,7 @@ This repo has all the scrips required to acomplish the following task:
     *Push Docker image to ECR*
     Please get the "registry_alias" from ECR registry and replace it in the ECR  URL 
     ```sh
-    registry_alias="m5z1k1h8" #Replace this value as needed
+    registry_alias=$(aws ecr-public  describe-registries  --region us-east-1 --query 'registries[*].aliases[*].name' --output text)
     docker tag nsolid-example:latest public.ecr.aws/${registry_alias}/nsolid-test
     docker push public.ecr.aws/${registry_alias}/nsolid-test
     ```
