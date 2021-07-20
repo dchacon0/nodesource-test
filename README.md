@@ -1,11 +1,13 @@
 # nodesource technical test
 
-1. Create a troposphere (https://github.com/cloudtools/troposphere) script to launch an
-ECS cluster, Application Load Balancer and an Auto Scaling Group that serve two
-random Node.js (You may use N|Solid images) microservices which images are pulled
-from ECR. Listeners should route traffic from the /service1 and /service2 URLs to
-the defined container ports. It is a plus if you add an Ansible playbook that is in charge of
-controlling the version of the ECS agent installed on the server.
+This repo has all the scrips required to acomplish the following task:
+
+    1. Create a troposphere (https://github.com/cloudtools/troposphere) script to launch an
+    ECS cluster, Application Load Balancer and an Auto Scaling Group that serve two
+    random Node.js (You may use N|Solid images) microservices which images are pulled
+    from ECR. Listeners should route traffic from the /service1 and /service2 URLs to
+    the defined container ports. It is a plus if you add an Ansible playbook that is in charge of
+    controlling the version of the ECS agent installed on the server.
 
 
 ## Build Docker Image 
