@@ -4,12 +4,18 @@ Description: CloudFormation template created from troposphere python library.Thi
 Outputs:
   SubnetOneID:
     Description: SubnetId of the subnet 1
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet1id'
     Value: !Ref 'EC2Subnet'
   SubnetThreeID:
     Description: SubnetId of the subnet 3
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet3id'
     Value: !Ref 'EC2Subnet3'
   SubnetTwoID:
     Description: SubnetId of the subnet 2
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet2id'
     Value: !Ref 'EC2Subnet2'
   VPCId:
     Description: VPCId of the newly created VPC

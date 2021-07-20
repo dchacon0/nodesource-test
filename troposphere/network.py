@@ -151,136 +151,6 @@ EC2VPCGatewayAttachment = template.add_resource(ec2.VPCGatewayAttachment(
 ))
 
 
-
-####################
-# Creating Security Groups 
-####################
-""" 
-EC2SecurityGroup = template.add_resource(ec2.SecurityGroup(
-    'EC2SecurityGroup',
-    GroupDescription='nsolid-loadbalancer',
-    GroupName='nsolid-loadbalancer',
-    VpcId=Ref(EC2VPC),
-    SecurityGroupIngress=[
-        ec2.SecurityGroupRule(
-            CidrIp='0.0.0.0/0',
-            FromPort=80,
-            IpProtocol='tcp',
-            ToPort=80
-        )
-    ],
-    SecurityGroupEgress=[
-        ec2.SecurityGroupRule(
-            CidrIp='0.0.0.0/0',
-            IpProtocol='-1'
-        )
-    ]
-))
-
-EC2SecurityGroup2 = template.add_resource(ec2.SecurityGroup(
-    'EC2SecurityGroup2',
-    GroupDescription='ECS Allowed Ports',
-    GroupName='EC2ContainerService-nsolid-cluster-EcsSecurityGroup-27ZAOBH1Z7JP',
-    Tags=[
-        {
-            "Key": 'aws:cloudformation:stack-name',
-            "Value": 'EC2ContainerService-nsolid-cluster'
-        },
-        {
-            "Key": 'aws:cloudformation:stack-id',
-            "Value": 'arn:aws:cloudformation:us-east-1:698090330670:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
-        },
-        {
-            "Key": 'aws:cloudformation:logical-id',
-            "Value": 'EcsSecurityGroup'
-        }
-    ],
-    VpcId=Ref(EC2VPC),
-    SecurityGroupIngress=[
-        ec2.SecurityGroupRule(
-            CidrIp='0.0.0.0/0',
-            FromPort=80,
-            IpProtocol='tcp',
-            ToPort=80
-        ),
-        ec2.SecurityGroupRule(
-            SourceSecurityGroupId=Ref(EC2SecurityGroup),
-            SourceSecurityGroupOwnerId='698090330670',
-            Description='LoadBalancer',
-            IpProtocol='-1'
-        ),
-        ec2.SecurityGroupRule(
-            CidrIp='0.0.0.0/0',
-            Description='temp',
-            FromPort=32768,
-            IpProtocol='tcp',
-            ToPort=32768
-        )
-    ],
-    SecurityGroupEgress=[
-        ec2.SecurityGroupRule(
-            CidrIp='0.0.0.0/0',
-            IpProtocol='-1'
-        )
-    ]
-))
-
-ElasticLoadBalancingV2TargetGroup = template.add_resource(elasticloadbalancingv2.TargetGroup(
-    'ElasticLoadBalancingV2TargetGroup',
-    HealthCheckIntervalSeconds=30,
-    HealthCheckPath='/',
-    Port=80,
-    Protocol='HTTP',
-    HealthCheckPort='traffic-port',
-    HealthCheckProtocol='HTTP',
-    HealthCheckTimeoutSeconds=5,
-    UnhealthyThresholdCount=2,
-    TargetType='instance',
-    Matcher=elasticloadbalancingv2.Matcher(
-        HttpCode='200'
-    ),
-    HealthyThresholdCount=5,
-    VpcId=Ref(EC2VPC),
-    Name='nsolid-loadbalancer-targetgroup',
-    HealthCheckEnabled=True,
-    TargetGroupAttributes=[
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='stickiness.enabled',
-            Value='false'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='deregistration_delay.timeout_seconds',
-            Value='300'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='stickiness.app_cookie.cookie_name',
-            Value=''
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='stickiness.type',
-            Value='lb_cookie'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='stickiness.lb_cookie.duration_seconds',
-            Value='86400'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='slow_start.duration_seconds',
-            Value='0'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='stickiness.app_cookie.duration_seconds',
-            Value='86400'
-        ),
-        elasticloadbalancingv2.TargetGroupAttribute(
-            Key='load_balancing.algorithm.type',
-            Value='round_robin'
-        )
-    ]
-))
-
- """
-
 ####################
 # Outputs
 ####################
@@ -290,6 +160,7 @@ SubnetOneID_output = template.add_output(
         "SubnetOneID",
         Description="SubnetId of the subnet 1",
         Value=Ref(EC2Subnet1),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet1id"))
     )
 )
 
@@ -298,6 +169,7 @@ SubnetTwoID_output = template.add_output(
         "SubnetTwoID",
         Description="SubnetId of the subnet 2",
         Value=Ref(EC2Subnet2),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet2id"))
     )
 )
 
@@ -306,6 +178,7 @@ SubnetThreeID_output = template.add_output(
         "SubnetThreeID",
         Description="SubnetId of the subnet 3",
         Value=Ref(EC2Subnet3),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet3id"))
     )
 )
 
