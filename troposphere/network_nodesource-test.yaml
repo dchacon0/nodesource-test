@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template created from troposphere python library.This
+  stack create a VPC network with three subnets and therir respective components
+Outputs:
+  SubnetOneID:
+    Description: SubnetId of the subnet 1
+    Value: !Ref 'EC2Subnet'
+  SubnetThreeID:
+    Description: SubnetId of the subnet 3
+    Value: !Ref 'EC2Subnet3'
+  SubnetTwoID:
+    Description: SubnetId of the subnet 2
+    Value: !Ref 'EC2Subnet2'
+  VPCId:
+    Description: VPCId of the newly created VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-vpcid'
+    Value: !Ref 'EC2VPC'
+Parameters:
+  CIDRBlock:
+    Default: 192.168.21.0/24
+    Description: 'CIDR Block for the VPC Network '
+    Type: String
+  ProjectName:
+    Default: nodesource-test
+    Description: Project Name
+    Type: String
+  SubnetCIDR1:
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+    Default: 192.168.21.0/26
+    Description: 'IP Address range for the  Subnet 1 '
+    Type: String
+  SubnetCIDR2:
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+    Default: 192.168.21.64/26
+    Description: 'IP Address range for the  Subnet 2 '
+    Type: String
+  SubnetCIDR3:
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+    Default: 192.168.21.128/26
+    Description: 'IP Address range for the Subnet 3 '
+    Type: String
+Resources:
+  EC2InternetGateway:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'ProjectName'
+    Type: AWS::EC2::InternetGateway
+  EC2Route:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'EC2InternetGateway'
+      RouteTableId: !Ref 'EC2RouteTable'
+    Type: AWS::EC2::Route
+  EC2RouteTable:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'ProjectName'
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::RouteTable
+  EC2Subnet:
+    Properties:
+      AvailabilityZone: us-east-1c
+      CidrBlock: !Ref 'SubnetCIDR1'
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::Subnet
+  EC2Subnet2:
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: !Ref 'SubnetCIDR2'
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::Subnet
+  EC2Subnet3:
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: !Ref 'SubnetCIDR3'
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::Subnet
+  EC2SubnetRouteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'EC2RouteTable'
+      SubnetId: !Ref 'EC2Subnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  EC2SubnetRouteTableAssociation2:
+    Properties:
+      RouteTableId: !Ref 'EC2RouteTable'
+      SubnetId: !Ref 'EC2Subnet2'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  EC2SubnetRouteTableAssociation3:
+    Properties:
+      RouteTableId: !Ref 'EC2RouteTable'
+      SubnetId: !Ref 'EC2Subnet3'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  EC2VPC:
+    Properties:
+      CidrBlock: !Ref 'CIDRBlock'
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Ref 'ProjectName'
+    Type: AWS::EC2::VPC
+  EC2VPCGatewayAttachment:
+    Properties:
+      InternetGatewayId: !Ref 'EC2InternetGateway'
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::VPCGatewayAttachment
