@@ -1,7 +1,7 @@
 from os import name
 from typing import DefaultDict
-from troposphere import Export, Sub, ec2, elasticloadbalancingv2
-from troposphere import Ref, Parameter, GetAtt, Template, Output
+from troposphere import Export, Sub, ec2
+from troposphere import Ref, Parameter, Template, Output
 
 template = Template()
 
@@ -9,6 +9,10 @@ template.set_version("2010-09-09")
 template.set_description(
     "CloudFormation template created from troposphere python library.This stack create a VPC network with three subnets and therir respective components")
 
+
+####################
+# Parameters
+####################
 ProjectName_param = template.add_parameter(Parameter(
     "ProjectName",
     Description="Project Name",

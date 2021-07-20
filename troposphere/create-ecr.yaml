@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template created from troposphere python library.This
+  stack create a ECR Public Repository
+Outputs:
+  ECRarn:
+    Description: ARN of the ECR Repository
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-ecr-arn'
+    Value: !GetAtt 'ECRPublicRepository.Arn'
+  ECRname:
+    Description: Name of the ECR Repository
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-ecr-name'
+    Value: !Ref 'ECRPublicRepository'
+Parameters:
+  RepositoryName:
+    Default: nodesource-test-2
+    Description: ECR Repository Name
+    Type: String
+Resources:
+  ECRPublicRepository:
+    Properties:
+      RepositoryCatalogData:
+        AboutText: ''
+        UsageText: ''
+      RepositoryName: !Ref 'RepositoryName'
+    Type: AWS::ECR::PublicRepository
