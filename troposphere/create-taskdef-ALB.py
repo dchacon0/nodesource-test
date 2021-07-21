@@ -151,6 +151,10 @@ ElasticLoadBalancingV2TargetGroup = template.add_resource(elasticloadbalancingv2
 ))
 
 
+
+
+### Listener Rules
+
 ElasticLoadBalancingV2Listener = template.add_resource(elasticloadbalancingv2.Listener(
     'ElasticLoadBalancingV2Listener',
     LoadBalancerArn=Ref(ElasticLoadBalancingV2LoadBalancer),
@@ -158,12 +162,95 @@ ElasticLoadBalancingV2Listener = template.add_resource(elasticloadbalancingv2.Li
     Protocol='HTTP',
     DefaultActions=[
         elasticloadbalancingv2.Action(
-            TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup),
-            Type='forward'
-        )
-    ]
+            Type="forward", 
+            TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup)),
+            # elasticloadbalancingv2.FixedResponseConfig(
+            #     {
+            #     "MessageBody": "You Are not Authorized to get this path, please validate the instructions. NodeSource.com | Technical test ",
+            #     "StatusCode": '503',
+            #     "ContentType": 'text/plain'   
+            #     }
+            # )
+
+    ],
+    # DefaultActions=[
+    #     elasticloadbalancingv2.Action(
+    #         FixedResponseConfig={
+    #             "MessageBody": "You Are not Authorized to get this path, please validate the instructions. NodeSource.com | Technical test ",
+    #             "StatusCode": '503',
+    #             "ContentType": 'text/plain'
+    #         },
+    #         Order=1,
+    #         Type='fixed-response'
+    #     )
+    # ]
 ))
 
+ElasticLoadBalancingV2ListenerRule = template.add_resource(elasticloadbalancingv2.ListenerRule(
+    'ElasticLoadBalancingV2ListenerRule',
+    Priority='1',
+    ListenerArn=Ref(ElasticLoadBalancingV2Listener),
+    Conditions=[
+        elasticloadbalancingv2.Condition(
+            Field='path-pattern',
+            Values=[
+                '/service1'
+            ]
+        )
+    ],
+    Actions=[elasticloadbalancingv2.Action(Type="forward", TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup))],
+    # Actions=[
+    #     elasticloadbalancingv2.Action(
+    #         Type='forward',
+    #         TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup),
+    #         Order=1,
+    #         ForwardConfig={
+    #             "TargetGroups": [
+    #                 {
+    #                     'TargetGroupArn': "${!Ref ElasticLoadBalancingV2TargetGroup}",
+    #                     'Weight': 1
+    #                 }
+    #             ],
+    #             "TargetGroupStickinessConfig": {
+    #                 'Enabled': False
+    #             }
+    #         }
+    #     )
+    # ]
+))
+
+ElasticLoadBalancingV2ListenerRule2 = template.add_resource(elasticloadbalancingv2.ListenerRule(
+    'ElasticLoadBalancingV2ListenerRule2',
+    Priority='2',
+    ListenerArn=Ref(ElasticLoadBalancingV2Listener),
+    Conditions=[
+        elasticloadbalancingv2.Condition(
+            Field='path-pattern',
+            Values=[
+                '/service2'
+            ]
+        )
+    ],
+    Actions=[elasticloadbalancingv2.Action(Type="forward", TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup))],
+    # Actions=[
+    #     elasticloadbalancingv2.Action(
+    #         Type='forward',
+    #         TargetGroupArn=Ref(ElasticLoadBalancingV2TargetGroup),
+    #         Order=1,
+    #         ForwardConfig={
+    #             "TargetGroups": [
+    #                 {
+    #                     'TargetGroupArn': "${!Ref ElasticLoadBalancingV2TargetGroup}",
+    #                     'Weight': 1
+    #                 }
+    #             ],
+    #             "TargetGroupStickinessConfig": {
+    #                 'Enabled': False
+    #             }
+    #         }
+    #     )
+    # ]
+))
 
 ####################
 # Task Definition

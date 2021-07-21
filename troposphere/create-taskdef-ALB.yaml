@@ -52,6 +52,30 @@ Resources:
       Port: 80
       Protocol: HTTP
     Type: AWS::ElasticLoadBalancingV2::Listener
+  ElasticLoadBalancingV2ListenerRule:
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref 'ElasticLoadBalancingV2TargetGroup'
+          Type: forward
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /service1
+      ListenerArn: !Ref 'ElasticLoadBalancingV2Listener'
+      Priority: '1'
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+  ElasticLoadBalancingV2ListenerRule2:
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref 'ElasticLoadBalancingV2TargetGroup'
+          Type: forward
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /service2
+      ListenerArn: !Ref 'ElasticLoadBalancingV2Listener'
+      Priority: '2'
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
   ElasticLoadBalancingV2LoadBalancer:
     Properties:
       IpAddressType: ipv4
