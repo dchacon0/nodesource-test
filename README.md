@@ -51,7 +51,7 @@ controlling the version of the ECS agent installed on theserver.
     *Creating AutoScaling Group, ECS Instances (EC2) and ECS Cluster*
     ```sh
     python3 create-ECS-ASG-EC2.py
-    aws --region us-east-1  cloudformation create-stack --stack-name create-ECS-ASG.EC2 --template-body file://create-ECS-ASG-EC2.yaml
+    aws --region us-east-1  cloudformation create-stack --stack-name create-ECS-ASG.EC2 --template-body file://create-ECS-ASG-EC2.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
     ```
     *Creating ECS Task Definition and ALB (Aplication Load Balancer)*
     ```sh

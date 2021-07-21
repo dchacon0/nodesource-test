@@ -314,6 +314,25 @@ LoadBalancerTargetGroupARN_output = template.add_output(
 )
 
 
+LoadBalancerARN_output = template.add_output(
+    Output(
+        "LoadBalancerARN",
+        Description="LoadBalancer ARN",
+        Value=Ref(ElasticLoadBalancingV2LoadBalancer),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-LoadBalancerARN"))
+    )
+)
+
+TaskDefinitionARN_output = template.add_output(
+    Output(
+        "TaskDefinitionARN",
+        Description="TaskDefinition ARN",
+        Value=Ref(ECSTaskDefinition),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-TaskDefinitionARN"))
+    )
+)
+
+
 
 #print(template.to_yaml())
 with open('create-taskdef-ALB.yaml', 'w') as f:

@@ -2,11 +2,21 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation template created from troposphere python library.This
   stack creates ALB and task definition '
 Outputs:
+  LoadBalancerARN:
+    Description: LoadBalancer ARN
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-LoadBalancerARN'
+    Value: !Ref 'ElasticLoadBalancingV2LoadBalancer'
   LoadBalancerTargetGroupARN:
     Description: Target Group ARN
     Export:
       Name: !Sub '${AWS::StackName}-nodesource-LoadBalancerTargetGroupARN'
     Value: !Ref 'ElasticLoadBalancingV2TargetGroup'
+  TaskDefinitionARN:
+    Description: TaskDefinition ARN
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-TaskDefinitionARN'
+    Value: !Ref 'ECSTaskDefinition'
 Parameters:
   ECRurl:
     Default: public.ecr.aws/m5z1k1h8/nsolid-test

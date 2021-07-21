@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template created from troposphere python library.This
   stack creates the ECS Cluster , ASG and their respective components in EC2
+Outputs:
+  ECSclusterARN:
+    Description: ECS Cluster ARN
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-ECSclusterARN'
+    Value: !GetAtt 'ECSCluster.Arn'
 Parameters:
   ECSClusterName:
     Default: nodesource-test2

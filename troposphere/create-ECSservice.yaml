@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template created from troposphere python library.This
+  stack creates ECS Service
+Parameters:
+  ProjectName:
+    Default: nodesource-test2
+    Description: Project Name
+    Type: String
+Resources:
+  ECSService:
+    Properties:
+      Cluster: !ImportValue 'create-ECS-ASG-EC2-nodesource-ECSclusterARN'
+      DeploymentConfiguration:
+        DeploymentCircuitBreaker:
+          Enable: false
+          Rollback: false
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 3
+      HealthCheckGracePeriodSeconds: 0
+      LaunchType: EC2
+      LoadBalancers:
+        - ContainerName: nsolid
+          ContainerPort: 8888
+          TargetGroupArn: !ImportValue 'create-taskdef-ALB-nodesource-LoadBalancerTargetGroupARN'
+      PlacementStrategies:
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: instanceId
+          Type: spread
+      SchedulingStrategy: REPLICA
+      ServiceName: !Join
+        - ''
+        - - !Ref 'ProjectName'
+          - -service
+      TaskDefinition: !ImportValue 'create-taskdef-ALB-nodesource-TaskDefinitionARN'
+    Type: AWS::ECS::Service
