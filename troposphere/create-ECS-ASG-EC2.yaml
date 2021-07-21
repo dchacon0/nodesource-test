@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template created from troposphere python library.This
+  stack creates the ECS Cluster , ASG and their respective components in EC2
+Parameters:
+  ECSClusterName:
+    Default: nodesource-test2
+    Description: ECS Cluster Name
+    Type: String
+  ProjectName:
+    Default: nodesource-test2
+    Description: Project Name
+    Type: String
+Resources:
+  AutoScalingAutoScalingGroup:
+    Properties:
+      AutoScalingGroupName: !Join
+        - ''
+        - - EC2ContainerService-
+          - !Ref 'ECSClusterName'
+          - -EcsInstanceAsg
+      AvailabilityZones:
+        - !ImportValue 'createvpc-testing-nodesource-subnet1AZ'
+        - !ImportValue 'createvpc-testing-nodesource-subnet2AZ'
+        - !ImportValue 'createvpc-testing-nodesource-subnet3AZ'
+      Cooldown: 300
+      DesiredCapacity: 3
+      HealthCheckGracePeriod: 0
+      HealthCheckType: EC2
+      LaunchConfigurationName: !Ref 'AutoScalingLaunchConfiguration'
+      MaxSize: 3
+      MinSize: 0
+      NewInstancesProtectedFromScaleIn: false
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: true
+          Value: !Join
+            - ''
+            - - EC2ContainerService-
+              - !Ref 'ECSClusterName'
+              - -EcsInstanceAsg
+      TerminationPolicies:
+        - Default
+      VPCZoneIdentifier:
+        - !ImportValue 'createvpc-testing-nodesource-subnet1id'
+        - !ImportValue 'createvpc-testing-nodesource-subnet2id'
+        - !ImportValue 'createvpc-testing-nodesource-subnet3id'
+    Type: AWS::AutoScaling::AutoScalingGroup
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
+      AutoScalingRollingUpdate:
+        MaxBatchSize: '1'
+        MinInstancesInService: '1'
+        PauseTime: PT5M
+        WaitOnResourceSignals: true
+  AutoScalingLaunchConfiguration:
+    Properties:
+      AssociatePublicIpAddress: true
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 30
+            VolumeType: gp2
+      EbsOptimized: false
+      IamInstanceProfile: !GetAtt 'EC2InstanceProfile.Arn'
+      ImageId: ami-091aa67fccd794d5f
+      InstanceMonitoring: true
+      InstanceType: t3.medium
+      LaunchConfigurationName: !Join
+        - ''
+        - - EC2ContainerService-
+          - !Ref 'ECSClusterName'
+          - -EcsInstance
+      SecurityGroups:
+        - !ImportValue 'createvpc-testing-nodesource-SecurityGroupEC2id'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - "#!/bin/bash\n"
+            - echo ECS_CLUSTER=
+            - !Ref 'ECSClusterName'
+            - '>>/etc/ecs/ecs.config'
+            - "\n"
+            - echo ECS_BACKEND_HOST= >> /etc/ecs/ecs.config;
+            - "\n"
+    Type: AWS::AutoScaling::LaunchConfiguration
+  EC2InstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'IAMRole'
+    Type: AWS::IAM::InstanceProfile
+  ECSCluster:
+    Properties:
+      ClusterName: !Ref 'ECSClusterName'
+    Type: AWS::ECS::Cluster
+  IAMRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+        Version: '2012-10-17'
+      Description: Allows EC2 instances to call AWS services on your behalf.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      MaxSessionDuration: 3600
+      Path: /
+      PermissionsBoundary: arn:aws:iam::1234567890123:policy/ScopePermissions
+      RoleName: !Join
+        - ''
+        - - containerInstanceECSRole-
+          - !Ref 'ECSClusterName'
+      Tags:
+        - Key: Name
+          Value: AmazonEC2ContainerServiceforEC2Role-nsolid-lab
+    Type: AWS::IAM::Role
+  IAMRole2:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+        Version: '2012-10-17'
+      Description: Allows EC2 instances to call AWS services on your behalf.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetAutoscaleRole
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole
+      MaxSessionDuration: 3600
+      Path: /
+      PermissionsBoundary: arn:aws:iam::1234567890123:policy/ScopePermissions
+      RoleName: !Join
+        - ''
+        - - ecsAutoscaleRole-
+          - !Ref 'ECSClusterName'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ''
+            - - ecsAutoscaleRole-
+              - !Ref 'ECSClusterName'
+    Type: AWS::IAM::Role
+  IAMServiceLinkedRole:
+    Properties:
+      AWSServiceName: ecs.amazonaws.com
+      Description: Role to enable Amazon ECS to manage your cluster.
+    Type: AWS::IAM::ServiceLinkedRole

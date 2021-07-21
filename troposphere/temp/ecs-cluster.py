@@ -23,7 +23,7 @@ EC2VPC = template.add_resource(ec2.VPC(
         },
         {
             "Key": 'aws:cloudformation:stack-id',
-            "Value": 'arn:aws:cloudformation:us-east-1:698090330670:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
+            "Value": 'arn:aws:cloudformation:us-east-1:1234567890123:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
         }
     ]
 ))
@@ -136,7 +136,7 @@ EC2SecurityGroup = template.add_resource(ec2.SecurityGroup(
         },
         {
             "Key": 'aws:cloudformation:stack-id',
-            "Value": 'arn:aws:cloudformation:us-east-1:698090330670:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
+            "Value": 'arn:aws:cloudformation:us-east-1:1234567890123:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
         },
         {
             "Key": 'aws:cloudformation:logical-id',
@@ -153,7 +153,7 @@ EC2SecurityGroup = template.add_resource(ec2.SecurityGroup(
         ),
         ec2.SecurityGroupRule(
             SourceSecurityGroupId=Ref(EC2SecurityGroup2),
-            SourceSecurityGroupOwnerId='698090330670',
+            SourceSecurityGroupOwnerId='1234567890123',
             Description='LoadBalancer',
             IpProtocol='-1'
         ),
@@ -220,7 +220,7 @@ EC2Instance2 = template.add_resource(ec2.Instance(
         },
         {
             "Key": 'aws:cloudformation:stack-id',
-            "Value": 'arn:aws:cloudformation:us-east-1:698090330670:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
+            "Value": 'arn:aws:cloudformation:us-east-1:1234567890123:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
         },
         {
             "Key": 'aws:cloudformation:stack-name',
@@ -286,14 +286,14 @@ ECSService = template.add_resource(ecs.Service(
     Cluster=GetAtt(ECSCluster, 'Arn'),
     LoadBalancers=[
         ecs.LoadBalancer(
-            TargetGroupArn='arn:aws:elasticloadbalancing:us-east-1:698090330670:targetgroup/nsolid-loadbalancer-targetgroup/3eec76aa46b2ea50',
+            TargetGroupArn='arn:aws:elasticloadbalancing:us-east-1:1234567890123:targetgroup/nsolid-loadbalancer-targetgroup/3eec76aa46b2ea50',
             ContainerName='nsolid',
             ContainerPort=8888
         )
     ],
     DesiredCount=2,
     LaunchType='EC2',
-    TaskDefinition='arn:aws:ecs:us-east-1:698090330670:task-definition/nsolid:1',
+    TaskDefinition='arn:aws:ecs:us-east-1:1234567890123:task-definition/nsolid:1',
     DeploymentConfiguration=ecs.DeploymentConfiguration(
         MaximumPercent=200,
         MinimumHealthyPercent=100,
@@ -302,7 +302,7 @@ ECSService = template.add_resource(ecs.Service(
             "Rollback": False
         }
     ),
-    Role='arn:aws:iam::698090330670:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS',
+    Role='arn:aws:iam::1234567890123:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS',
     PlacementStrategies=[
         ecs.PlacementStrategy(
             Type='spread',
@@ -348,7 +348,7 @@ EC2Instance = template.add_resource(ec2.Instance(
     Tags=[
         {
             "Key": 'aws:cloudformation:stack-id',
-            "Value": 'arn:aws:cloudformation:us-east-1:698090330670:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
+            "Value": 'arn:aws:cloudformation:us-east-1:1234567890123:stack/EC2ContainerService-nsolid-cluster/1143d690-e823-11eb-9b62-0ab0f473fdd5'
         },
         {
             "Key": 'aws:autoscaling:groupName',
@@ -417,7 +417,7 @@ ECRRepository = template.add_resource(ecr.Repository(
     'ECRRepository',
     RepositoryName='nsolid-test',
     LifecyclePolicy=ecr.LifecyclePolicy(
-        RegistryId='698090330670'
+        RegistryId='1234567890123'
     )
 ))
 

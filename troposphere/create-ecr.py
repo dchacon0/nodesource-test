@@ -12,7 +12,7 @@ template.set_description(
 RepositoryName = template.add_parameter(Parameter(
     "RepositoryName",
     Description="ECR Repository Name",
-    Default= "nodesource-test-2",
+    Default= "nsolid-test",
     Type="String",
 ))
 

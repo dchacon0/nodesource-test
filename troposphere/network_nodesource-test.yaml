@@ -2,16 +2,41 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template created from troposphere python library.This
   stack create a VPC network with three subnets and therir respective components
 Outputs:
+  SecurityGroupALBid:
+    Description: Security Group Id for ALB
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-SecurityGroupALBid'
+    Value: !Ref 'SecurityGroupALB'
+  SecurityGroupECid:
+    Description: Security Group Id for EC2
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-SecurityGroupEC2id'
+    Value: !Ref 'SecurityGroupEC2'
+  SubnetOneAZ:
+    Description: AvalaibilityZone of the subnet 1
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet1AZ'
+    Value: !GetAtt 'EC2Subnet.AvailabilityZone'
   SubnetOneID:
     Description: SubnetId of the subnet 1
     Export:
       Name: !Sub '${AWS::StackName}-nodesource-subnet1id'
     Value: !Ref 'EC2Subnet'
+  SubnetThreeAZ:
+    Description: AvalaibilityZone of the subnet 3
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet3AZ'
+    Value: !GetAtt 'EC2Subnet3.AvailabilityZone'
   SubnetThreeID:
     Description: SubnetId of the subnet 3
     Export:
       Name: !Sub '${AWS::StackName}-nodesource-subnet3id'
     Value: !Ref 'EC2Subnet3'
+  SubnetTwoAZ:
+    Description: AvalaibilityZone of the subnet 2
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-subnet2AZ'
+    Value: !GetAtt 'EC2Subnet2.AvailabilityZone'
   SubnetTwoID:
     Description: SubnetId of the subnet 2
     Export:
@@ -117,3 +142,49 @@ Resources:
       InternetGatewayId: !Ref 'EC2InternetGateway'
       VpcId: !Ref 'EC2VPC'
     Type: AWS::EC2::VPCGatewayAttachment
+  SecurityGroupALB:
+    Properties:
+      GroupDescription: Loadbalancer SG for nsolid cluster
+      GroupName: !Join
+        - ''
+        - - !Ref 'ProjectName'
+          - LoadBalancer-SG
+      SecurityGroupEgress:
+        - CidrIp: '0.0.0.0/0'
+          IpProtocol: '-1'
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          Description: HTTP Traffic
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ''
+            - - !Ref 'ProjectName'
+              - LoadBalancer-SG
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::SecurityGroup
+  SecurityGroupEC2:
+    Properties:
+      GroupDescription: ECS Allowed Ports
+      GroupName: !Join
+        - ''
+        - - !Ref 'ProjectName'
+          - EC2ForECSService-SG
+      SecurityGroupEgress:
+        - CidrIp: '0.0.0.0/0'
+          IpProtocol: '-1'
+      SecurityGroupIngress:
+        - CidrIp: !Ref 'CIDRBlock'
+          Description: Internal Network
+          IpProtocol: '-1'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ''
+            - - !Ref 'ProjectName'
+              - EC2ForECSService-SG
+      VpcId: !Ref 'EC2VPC'
+    Type: AWS::EC2::SecurityGroup

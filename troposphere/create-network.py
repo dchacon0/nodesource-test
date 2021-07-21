@@ -1,7 +1,7 @@
 from os import name
 from typing import DefaultDict
-from troposphere import Export, Sub, ec2
-from troposphere import Ref, Parameter, Template, Output
+from troposphere import Export, GetAtt, Sub, ec2
+from troposphere import Ref, Parameter, Template, Output, Join
 
 template = Template()
 
@@ -156,6 +156,67 @@ EC2VPCGatewayAttachment = template.add_resource(ec2.VPCGatewayAttachment(
 
 
 ####################
+# Security Groups
+####################
+
+
+SecurityGroup_ALB = template.add_resource(ec2.SecurityGroup(
+    'SecurityGroupALB',
+    GroupDescription='Loadbalancer SG for nsolid cluster',
+    GroupName=Join("", [Ref(ProjectName_param),"LoadBalancer-SG"]),
+    Tags=[
+        {
+            "Key": 'Name',
+            "Value": Join("", [Ref(ProjectName_param),"LoadBalancer-SG"])
+        }
+    ],    
+    VpcId=Ref(EC2VPC),
+    SecurityGroupIngress=[
+        ec2.SecurityGroupRule(
+            CidrIp='0.0.0.0/0',
+            FromPort=80,
+            Description='HTTP Traffic',
+            IpProtocol='tcp',
+            ToPort=80
+        )
+    ],
+    SecurityGroupEgress=[
+        ec2.SecurityGroupRule(
+            CidrIp='0.0.0.0/0',
+            IpProtocol='-1'
+        )
+    ]
+))
+
+
+SecurityGroup_EC2 = template.add_resource(ec2.SecurityGroup(
+    'SecurityGroupEC2',
+    GroupDescription='ECS Allowed Ports',
+    GroupName=Join("", [Ref(ProjectName_param),"EC2ForECSService-SG"]),
+    Tags=[
+        {
+            "Key": 'Name',
+            "Value": Join("", [Ref(ProjectName_param),"EC2ForECSService-SG"])
+        }
+    ],
+    VpcId=Ref(EC2VPC),
+    SecurityGroupIngress=[
+        ec2.SecurityGroupRule(
+            CidrIp=Ref(VPCcidrblock_param),
+            Description='Internal Network',
+            IpProtocol='-1'
+        )
+    ],
+    SecurityGroupEgress=[
+        ec2.SecurityGroupRule(
+            CidrIp='0.0.0.0/0',
+            IpProtocol='-1'
+        )
+    ]
+))
+
+
+####################
 # Outputs
 ####################
 
@@ -168,6 +229,16 @@ SubnetOneID_output = template.add_output(
     )
 )
 
+SubnetOneAZ_output = template.add_output(
+    Output(
+        "SubnetOneAZ",
+        Description="AvalaibilityZone of the subnet 1",
+        Value=GetAtt(EC2Subnet1, "AvailabilityZone"),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet1AZ"))
+    )
+)
+
+
 SubnetTwoID_output = template.add_output(
     Output(
         "SubnetTwoID",
@@ -177,6 +248,16 @@ SubnetTwoID_output = template.add_output(
     )
 )
 
+SubnetTwoAZ_output = template.add_output(
+    Output(
+        "SubnetTwoAZ",
+        Description="AvalaibilityZone of the subnet 2",
+        Value=GetAtt(EC2Subnet2, "AvailabilityZone"),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet2AZ"))
+    )
+)
+
+
 SubnetThreeID_output = template.add_output(
     Output(
         "SubnetThreeID",
@@ -185,6 +266,16 @@ SubnetThreeID_output = template.add_output(
         Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet3id"))
     )
 )
+SubnetThreeAZ_output = template.add_output(
+    Output(
+        "SubnetThreeAZ",
+        Description="AvalaibilityZone of the subnet 3",
+        Value=GetAtt(EC2Subnet3, "AvailabilityZone"),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-subnet3AZ"))
+    )
+)
+
+
 
 VPCId_output = template.add_output(
     Output(
@@ -194,6 +285,28 @@ VPCId_output = template.add_output(
         Export =  Export(Sub("${AWS::StackName}-" + "nodesource-vpcid"))
     )
 )
+
+
+SecurityGroupEC2id_output = template.add_output(
+    Output(
+        "SecurityGroupECid",
+        Description="Security Group Id for EC2",
+        Value=Ref(SecurityGroup_EC2),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-SecurityGroupEC2id"))
+    )
+)
+
+SecurityGroupALBid_output = template.add_output(
+    Output(
+        "SecurityGroupALBid",
+        Description="Security Group Id for ALB",
+        Value=Ref(SecurityGroup_ALB),
+        Export =  Export(Sub("${AWS::StackName}-" + "nodesource-SecurityGroupALBid"))
+    )
+)
+
+
+
 #print(template.to_yaml())
 with open('network_nodesource-test.yaml', 'w') as f:
     f.write(template.to_yaml())

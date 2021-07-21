@@ -23,7 +23,7 @@ controlling the version of the ECS agent installed on theserver.
     ```
 3. **Push the Docker Image to ECR**
 
-    *Validate that the container is properly working  (Optional)*
+    *Validate that the container is properly working  **(Optional)***
     ```sh
     docker network create docker_nsolid
     docker build -t nsolid-example .
@@ -50,8 +50,8 @@ controlling the version of the ECS agent installed on theserver.
     ```
     *Creating AutoScaling Group, ECS Instances (EC2) and ECS Cluster*
     ```sh
-    python3 create-ECS-ASG_EC2.py
-    aws --region us-east-1  cloudformation create-stack --stack-name create-ECS-ASG_EC2 --template-body file://create-ECS-ASG_EC2.yaml
+    python3 create-ECS-ASG-EC2.py
+    aws --region us-east-1  cloudformation create-stack --stack-name create-ECS-ASG.EC2 --template-body file://create-ECS-ASG-EC2.yaml
     ```
     *Creating ECS Task Definition and ALB (Aplication Load Balancer)*
     ```sh
