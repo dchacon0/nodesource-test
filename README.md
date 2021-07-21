@@ -56,7 +56,7 @@ controlling the version of the ECS agent installed on theserver.
     *Creating ECS Task Definition and ALB (Aplication Load Balancer)*
     ```sh
     python3 create-taskdef-ALB.py
-    aws --region us-east-1  cloudformation create-stack --stack-name create-taskdef-ALB --template-body file://create-taskdef-ALB.yaml
+    aws --region us-east-1  cloudformation create-stack --stack-name create-taskdef-ALB --template-body file://create-taskdef-ALB.yaml --parameters ParameterKey=ECRurl,ParameterValue=public.ecr.aws/${registry_alias}/nsolid-test
     ```
     *Creating ECS Service*
     ```sh

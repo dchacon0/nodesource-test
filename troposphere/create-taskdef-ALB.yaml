@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template created from troposphere python library.This
+  stack creates ALB and task definition '
+Outputs:
+  LoadBalancerTargetGroupARN:
+    Description: Target Group ARN
+    Export:
+      Name: !Sub '${AWS::StackName}-nodesource-LoadBalancerTargetGroupARN'
+    Value: !Ref 'ElasticLoadBalancingV2TargetGroup'
+Parameters:
+  ECRurl:
+    Default: public.ecr.aws/m5z1k1h8/nsolid-test
+    Description: URL of the public repository (ECR)
+    Type: String
+  ProjectName:
+    Default: nodesource-test2
+    Description: Project Name
+    Type: String
+Resources:
+  ECSTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+        - Environment:
+            - Name: NSOLID_APPNAME
+              Value: nodesource-technical-test
+            - Name: NSOLID_COMMAND
+              Value: console:9001
+            - Name: NSOLID_DATA
+              Value: console:9002
+            - Name: NSOLID_BULK
+              Value: console:9003
+          Essential: true
+          Image: !Ref 'ECRurl'
+          Name: nsolid
+          PortMappings:
+            - ContainerPort: 8888
+              HostPort: 0
+              Protocol: tcp
+      Cpu: '512'
+      Family: nsolid
+      Memory: '256'
+      NetworkMode: bridge
+      RequiresCompatibilities:
+        - EC2
+    Type: AWS::ECS::TaskDefinition
+  ElasticLoadBalancingV2Listener:
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'ElasticLoadBalancingV2TargetGroup'
+          Type: forward
+      LoadBalancerArn: !Ref 'ElasticLoadBalancingV2LoadBalancer'
+      Port: 80
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  ElasticLoadBalancingV2LoadBalancer:
+    Properties:
+      IpAddressType: ipv4
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: 'false'
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
+        - Key: deletion_protection.enabled
+          Value: 'false'
+        - Key: routing.http2.enabled
+          Value: 'true'
+        - Key: routing.http.drop_invalid_header_fields.enabled
+          Value: 'false'
+        - Key: routing.http.desync_mitigation_mode
+          Value: defensive
+        - Key: waf.fail_open.enabled
+          Value: 'false'
+        - Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+          Value: 'false'
+      Name: !Join
+        - ''
+        - - !Ref 'ProjectName'
+          - -loadbalancer
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue 'createvpc-testing-nodesource-SecurityGroupALBid'
+      Subnets:
+        - !ImportValue 'createvpc-testing-nodesource-subnet1id'
+        - !ImportValue 'createvpc-testing-nodesource-subnet2id'
+        - !ImportValue 'createvpc-testing-nodesource-subnet3id'
+      Type: application
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  ElasticLoadBalancingV2TargetGroup:
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckPort: traffic-port
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      Name: !Join
+        - ''
+        - - !Ref 'ProjectName'
+          - targetgroup
+      Port: 8888
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'false'
+        - Key: deregistration_delay.timeout_seconds
+          Value: '300'
+        - Key: stickiness.app_cookie.cookie_name
+          Value: ''
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '86400'
+        - Key: slow_start.duration_seconds
+          Value: '0'
+        - Key: stickiness.app_cookie.duration_seconds
+          Value: '86400'
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
+      TargetType: instance
+      UnhealthyThresholdCount: 2
+      VpcId: !ImportValue 'createvpc-testing-nodesource-vpcid'
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup

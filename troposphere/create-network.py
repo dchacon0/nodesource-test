@@ -7,7 +7,7 @@ template = Template()
 
 template.set_version("2010-09-09")
 template.set_description(
-    "CloudFormation template created from troposphere python library.This stack create a VPC network with three subnets and therir respective components")
+    "CloudFormation template created from troposphere python library.This stack creates a VPC network with three subnets and therir respective components")
 
 
 ####################
