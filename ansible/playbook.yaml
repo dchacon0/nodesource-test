@@ -1,0 +1,9 @@
+---
+- name: Update ECS Agents 
+  hosts: ECS-Instances
+  user: ec2-user
+  tasks:
+    - yum:
+        name: "ecs-init"
+        state: latest
+      become: true
