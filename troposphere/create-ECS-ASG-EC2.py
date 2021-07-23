@@ -154,7 +154,7 @@ AutoScalingLaunchConfiguration = template.add_resource(autoscaling.LaunchConfigu
     ImageId='ami-091aa67fccd794d5f', ## Replace here with the most updated AMi for ECS
     #KeyName='nsolid-lab',
     SecurityGroups=[
-        ImportValue("createvpc-testing-nodesource-SecurityGroupEC2id") #Replace with the output of the SecurityGroup id
+        ImportValue("create-network-nodesource-SecurityGroupEC2id") #Replace with the output of the SecurityGroup id
     ],
     #UserData='IyEvYmluL2Jhc2gKZWNobyBFQ1NfQ0xVU1RFUj1ub2Rlc291cmNlLXRlc3QgPj4gL2V0Yy9lY3MvZWNzLmNvbmZpZztlY2hvIEVDU19CQUNLRU5EX0hPU1Q9ID4+IC9ldGMvZWNzL2Vjcy5jb25maWc7',
     UserData=Base64(
@@ -199,9 +199,9 @@ AutoScalingAutoScalingGroup = template.add_resource(autoscaling.AutoScalingGroup
     DesiredCapacity=3,
     Cooldown=300,
     AvailabilityZones=[
-        ImportValue("createvpc-testing-nodesource-subnet1AZ"),
-        ImportValue("createvpc-testing-nodesource-subnet2AZ"),
-        ImportValue("createvpc-testing-nodesource-subnet3AZ")
+        ImportValue("create-network-nodesource-subnet1AZ"),
+        ImportValue("create-network-nodesource-subnet2AZ"),
+        ImportValue("create-network-nodesource-subnet3AZ")
     ],
     HealthCheckType='EC2',
 
@@ -218,9 +218,9 @@ AutoScalingAutoScalingGroup = template.add_resource(autoscaling.AutoScalingGroup
     ),    
     HealthCheckGracePeriod=0,
     VPCZoneIdentifier=[
-        ImportValue("createvpc-testing-nodesource-subnet1id"),
-        ImportValue("createvpc-testing-nodesource-subnet2id"),
-        ImportValue("createvpc-testing-nodesource-subnet3id")
+        ImportValue("create-network-nodesource-subnet1id"),
+        ImportValue("create-network-nodesource-subnet2id"),
+        ImportValue("create-network-nodesource-subnet3id")
     ],
     TerminationPolicies=[
         'Default'

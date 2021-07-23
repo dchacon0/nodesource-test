@@ -37,12 +37,12 @@ ElasticLoadBalancingV2LoadBalancer = template.add_resource(elasticloadbalancingv
     Scheme='internet-facing',
     Type='application',
     Subnets=[
-        ImportValue("createvpc-testing-nodesource-subnet1id"),
-        ImportValue("createvpc-testing-nodesource-subnet2id"),
-        ImportValue("createvpc-testing-nodesource-subnet3id")
+        ImportValue("create-network-nodesource-subnet1id"),
+        ImportValue("create-network-nodesource-subnet2id"),
+        ImportValue("create-network-nodesource-subnet3id")
     ],
     SecurityGroups=[
-        ImportValue("createvpc-testing-nodesource-SecurityGroupALBid")
+        ImportValue("create-network-nodesource-SecurityGroupALBid")
     ],
     IpAddressType='ipv4',
     LoadBalancerAttributes=[
@@ -98,7 +98,7 @@ ElasticLoadBalancingV2TargetGroup = template.add_resource(elasticloadbalancingv2
         HttpCode='200'
     ),
     HealthyThresholdCount=5,
-    VpcId=ImportValue("createvpc-testing-nodesource-vpcid"),
+    VpcId=ImportValue("create-network-nodesource-vpcid"),
     HealthCheckEnabled=True,
     TargetGroupAttributes=[
         elasticloadbalancingv2.TargetGroupAttribute(

@@ -308,7 +308,7 @@ SecurityGroupALBid_output = template.add_output(
 
 
 #print(template.to_yaml())
-with open('network_nodesource-test.yaml', 'w') as f:
+with open('create-network.yaml', 'w') as f:
     f.write(template.to_yaml())
 
 

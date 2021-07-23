@@ -19,11 +19,14 @@ controlling the version of the ECS agent installed on theserver.
 2. **Create the ECR Repository**
     ```sh
     python3 create-ecr.py # troposphere script that create cloudformation file with name "create-ecr.yaml"
-    aws --region us-east-1  cloudformation create-stack --stack-name create-ecr-nodesource --template-body file://create-ecr.yaml # Remember you should have configured the AWSCLI authentication
+    aws --region us-east-1  cloudformation create-stack --stack-name \
+    create-ecr-nodesource \
+    --parameters ParameterKey=RepositoryName,ParameterValue=nsolid-test \
+    --template-body file://create-ecr.yaml # Remember you should have configured the AWSCLI authentication 
     ```
 3. **Push the Docker Image to ECR**
 
-    *Validate that the container is properly working  **(Optional)***
+    *Validate that the container is properly working*  **(Optional)***
     ```sh
     docker network create docker_nsolid
     docker build -t nsolid-example .
@@ -37,7 +40,7 @@ controlling the version of the ECS agent installed on theserver.
     Please get the "registry_alias" from ECR registry and replace it in the ECR  URL 
     ```sh
     registry_alias=$(aws ecr-public  describe-registries  --region us-east-1 --query 'registries[*].aliases[*].name' --output text)
-    docker tag nsolid-example:latest public.ecr.aws/${registry_alias}/nsolid-test
+    docker tag nsolid-example:latest public.ecr.aws/${registry_alias}nsolid-test/
     docker push public.ecr.aws/${registry_alias}/nsolid-test
     ```
 
@@ -46,7 +49,10 @@ controlling the version of the ECS agent installed on theserver.
     *Creating VPC Networks and Security Groups*
     ```sh
     python3 create-network.py
-    aws --region us-east-1  cloudformation create-stack --stack-name create-network --template-body file://create-network.yaml
+    aws --region us-east-1  cloudformation \
+    create-stack --stack-name create-network \
+    --parameters ParameterKey=ProjectName,ParameterValue=nodesource-test \
+    --template-body file://create-network.yaml
     ```
     *Creating AutoScaling Group, ECS Instances (EC2) and ECS Cluster*
     ```sh
